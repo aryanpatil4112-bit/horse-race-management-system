@@ -5,8 +5,12 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem('user');
-    return savedUser ? JSON.parse(savedUser) : null;
+    try {
+      const savedUser = localStorage.getItem('user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
+    }
   });
   const [token, setToken] = useState(() => localStorage.getItem('token'));
   const [loading, setLoading] = useState(false);
@@ -15,7 +19,14 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const res = await api.post('/auth/login', { email, password });
-      const authData = res.data;
+      
+      // Robust payload extraction whether API returns { data: { token, ... } } or { token, ... }
+      const authData = (res && res.data) ? res.data : res;
+
+      if (!authData || !authData.token) {
+        throw new Error('Invalid email or password.');
+      }
+
       setUser(authData);
       setToken(authData.token);
       localStorage.setItem('token', authData.token);
