@@ -9,12 +9,16 @@ const api = axios.create({
   },
 });
 
-// Request Interceptor: Attach JWT Token if available
+// Request Interceptor: Attach JWT Token if available (except for auth requests)
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
-    if (token) {
+    const isAuthRoute = config.url && (config.url.includes('/auth/login') || config.url.includes('/auth/register'));
+    
+    if (token && !isAuthRoute) {
       config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
     }
     return config;
   },
@@ -29,7 +33,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      if (window.location.pathname !== '/login') {
+      if (window.location.pathname !== '/login' && window.location.pathname !== '/signup') {
         window.location.href = '/login';
       }
     }
