@@ -3,6 +3,7 @@ package com.horserace.dto;
 import com.horserace.entity.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 public class AuthDTOs {
@@ -11,11 +12,11 @@ public class AuthDTOs {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LoginRequest {
-        @NotBlank(message = "Email is required")
-        @Email(message = "Invalid email format")
+        @NotBlank(message = "Please enter your email address.")
+        @Email(message = "Please enter a valid email address.")
         private String email;
 
-        @NotBlank(message = "Password is required")
+        @NotBlank(message = "Please enter your password.")
         private String password;
     }
 
@@ -35,14 +36,31 @@ public class AuthDTOs {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class RegisterRequest {
-        @NotBlank(message = "Name is required")
+        @NotBlank(message = "Please enter your full name.")
         private String name;
 
-        @NotBlank(message = "Email is required")
-        @Email(message = "Invalid email format")
+        @NotBlank(message = "Please enter your email address.")
+        @Email(message = "Please enter a valid email address.")
         private String email;
 
-        @NotBlank(message = "Password is required")
+        @NotBlank(message = "Please enter your password.")
+        @Size(min = 8, message = "Password must contain at least 8 characters.")
+        private String password;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AdminCreateUserRequest {
+        @NotBlank(message = "Please enter full name.")
+        private String name;
+
+        @NotBlank(message = "Please enter email address.")
+        @Email(message = "Please enter a valid email address.")
+        private String email;
+
+        @NotBlank(message = "Please enter password.")
+        @Size(min = 8, message = "Password must contain at least 8 characters.")
         private String password;
 
         private Role role; // ADMIN, RACE_OFFICIAL, VIEWER

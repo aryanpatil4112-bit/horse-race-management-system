@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/Toast';
 import { Shield, User, Lock, Eye, EyeOff } from 'lucide-react';
 
 export const Login = () => {
-  const [email, setEmail] = useState('admin@horserace.com');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const { login, loading } = useAuth();
@@ -16,20 +16,25 @@ export const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (!email.trim()) {
+      setError('Please enter your email address.');
+      return;
+    }
+    if (!password) {
+      setError('Please enter your password.');
+      return;
+    }
+
     try {
-      await login(email, password);
+      await login(email.trim(), password);
       showToast('Welcome back to RACEHUB Portal!', 'success');
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message || 'Login failed. Please check credentials.');
-      showToast(err.message || 'Login failed', 'error');
+      const errMsg = err.message || 'Invalid email or password.';
+      setError(errMsg);
+      showToast(errMsg, 'error');
     }
-  };
-
-  const handleDemoPreset = (presetEmail, presetPass, roleName) => {
-    setEmail(presetEmail);
-    setPassword(presetPass);
-    showToast(`Loaded ${roleName} credentials`, 'success');
   };
 
   return (
@@ -98,7 +103,7 @@ export const Login = () => {
                 style={{ paddingLeft: '2.6rem' }}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@horserace.com"
+                placeholder="Enter your email"
                 required
               />
               <User size={18} color="var(--text-muted)" style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)' }} />
@@ -114,7 +119,7 @@ export const Login = () => {
                 style={{ paddingLeft: '2.6rem', paddingRight: '2.6rem' }}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder="Enter your password"
                 required
               />
               <Lock size={18} color="var(--text-muted)" style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)' }} />
@@ -134,40 +139,17 @@ export const Login = () => {
             style={{ width: '100%', marginTop: '1.25rem', padding: '0.85rem', fontSize: '1rem', fontWeight: 700 }}
             disabled={loading}
           >
-            {loading ? 'AUTHENTICATING...' : 'SIGN IN TO PORTAL'}
+            {loading ? 'SIGNING IN...' : 'SIGN IN TO PORTAL'}
           </button>
         </form>
 
-        <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-color)' }}>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.08em', textAlign: 'center', fontWeight: 700 }}>
-            Demo Account Switcher
+        <div style={{ marginTop: '1.75rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-color)', textAlign: 'center' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>
+            Don't have an account?{' '}
+            <Link to="/signup" style={{ color: 'var(--accent-emerald)', fontWeight: 600, textDecoration: 'none' }}>
+              Sign Up
+            </Link>
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
-            <button
-              type="button"
-              className="btn btn-secondary btn-sm"
-              style={{ fontSize: '0.775rem' }}
-              onClick={() => handleDemoPreset('admin@horserace.com', 'admin123', 'ADMIN')}
-            >
-              Admin
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary btn-sm"
-              style={{ fontSize: '0.775rem' }}
-              onClick={() => handleDemoPreset('official@horserace.com', 'official123', 'Official')}
-            >
-              Official
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary btn-sm"
-              style={{ fontSize: '0.775rem' }}
-              onClick={() => handleDemoPreset('viewer@horserace.com', 'viewer123', 'Viewer')}
-            >
-              Viewer
-            </button>
-          </div>
         </div>
       </div>
     </div>

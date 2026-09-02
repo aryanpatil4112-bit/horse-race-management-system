@@ -33,37 +33,49 @@ public class AuthService {
     }
 
     public LoginResponse login(LoginRequest loginRequest) {
-        User user = userRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + loginRequest.getEmail()));
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+            );
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
-        );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String token = tokenProvider.generateToken(authentication);
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = tokenProvider.generateToken(authentication);
+            User user = userRepository.findByEmail(loginRequest.getEmail())
+                    .orElseThrow(() -> new BadRequestException("Invalid email or password."));
 
-        return LoginResponse.builder()
-                .token(token)
-                .userId(user.getUserId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .role(user.getRole())
-                .build();
+            return LoginResponse.builder()
+                    .token(token)
+                    .userId(user.getUserId())
+                    .name(user.getName())
+                    .email(user.getEmail())
+                    .role(user.getRole())
+                    .build();
+        } catch (Exception ex) {
+            throw new BadRequestException("Invalid email or password.");
+        }
     }
 
     public UserDTO register(RegisterRequest registerRequest) {
-        if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            throw new BadRequestException("Email address is already in use: " + registerRequest.getEmail());
+        if (registerRequest.getEmail() == null || !registerRequest.getEmail().contains("@")) {
+            throw new BadRequestException("Please enter a valid email address.");
         }
 
-        Role role = registerRequest.getRole() != null ? registerRequest.getRole() : Role.VIEWER;
+        if (registerRequest.getPassword() == null || registerRequest.getPassword().length() < 8) {
+            throw new BadRequestException("Password must contain at least 8 characters.");
+        }
 
+        if (userRepository.existsByEmail(registerRequest.getEmail().trim().toLowerCase())) {
+            throw new BadRequestException("An account with this email already exists.");
+        }
+
+        // CRITICAL SECURITY ENFORCEMENT: Public signup is strictly VIEWER ONLY.
+        // Ignore any client attempt to request ADMIN or RACE_OFFICIAL roles.
         User user = User.builder()
-                .name(registerRequest.getName())
-                .email(registerRequest.getEmail())
+                .name(registerRequest.getName().trim())
+                .email(registerRequest.getEmail().trim().toLowerCase())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .role(role)
+                .role(Role.VIEWER)
                 .build();
 
         User savedUser = userRepository.save(user);

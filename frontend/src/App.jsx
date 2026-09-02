@@ -6,6 +6,7 @@ import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 
 import { Login } from './pages/Login';
+import { Signup } from './pages/Signup';
 import { Dashboard } from './pages/Dashboard';
 import { Horses } from './pages/Horses';
 import { Jockeys } from './pages/Jockeys';
@@ -44,6 +45,7 @@ export function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
 
             <Route
               path="/dashboard"
