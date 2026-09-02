@@ -4,7 +4,6 @@ import com.horserace.dto.AuthDTOs.*;
 import com.horserace.entity.Role;
 import com.horserace.entity.User;
 import com.horserace.exception.BadRequestException;
-import com.horserace.exception.ResourceNotFoundException;
 import com.horserace.repository.UserRepository;
 import com.horserace.security.JwtTokenProvider;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,15 +32,21 @@ public class AuthService {
     }
 
     public LoginResponse login(LoginRequest loginRequest) {
+        if (loginRequest.getEmail() == null || loginRequest.getPassword() == null) {
+            throw new BadRequestException("Invalid email or password.");
+        }
+
+        String normalizedEmail = loginRequest.getEmail().trim().toLowerCase();
+
         try {
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+                    new UsernamePasswordAuthenticationToken(normalizedEmail, loginRequest.getPassword())
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String token = tokenProvider.generateToken(authentication);
 
-            User user = userRepository.findByEmail(loginRequest.getEmail())
+            User user = userRepository.findByEmail(normalizedEmail)
                     .orElseThrow(() -> new BadRequestException("Invalid email or password."));
 
             return LoginResponse.builder()
@@ -65,7 +70,9 @@ public class AuthService {
             throw new BadRequestException("Password must contain at least 8 characters.");
         }
 
-        if (userRepository.existsByEmail(registerRequest.getEmail().trim().toLowerCase())) {
+        String normalizedEmail = registerRequest.getEmail().trim().toLowerCase();
+
+        if (userRepository.existsByEmail(normalizedEmail)) {
             throw new BadRequestException("An account with this email already exists.");
         }
 
@@ -73,7 +80,7 @@ public class AuthService {
         // Ignore any client attempt to request ADMIN or RACE_OFFICIAL roles.
         User user = User.builder()
                 .name(registerRequest.getName().trim())
-                .email(registerRequest.getEmail().trim().toLowerCase())
+                .email(normalizedEmail)
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .role(Role.VIEWER)
                 .build();
