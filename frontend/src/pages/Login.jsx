@@ -35,7 +35,7 @@ export const Login = () => {
         setError('Please enter the Admin Master Security Key.');
         return;
       }
-      // Verify Admin Security Passcode (Default: 8899 or ADMIN-2026)
+      // Verify Admin Security Passcode
       if (adminPin.trim() !== '8899' && adminPin.trim() !== 'ADMIN-2026') {
         setError('Invalid Admin Security Passcode. Access denied.');
         showToast('Invalid Admin Security Passcode', 'error');
@@ -157,7 +157,7 @@ export const Login = () => {
                 style={{ paddingLeft: '2.6rem' }}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder={activeTab === 'admin' ? 'admin@horserace.com' : 'Enter your email'}
+                placeholder={activeTab === 'admin' ? 'Enter admin email' : 'Enter your email'}
                 required
               />
               <User size={18} color="var(--text-muted)" style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)' }} />
@@ -198,7 +198,7 @@ export const Login = () => {
                   style={{ paddingLeft: '2.6rem', paddingRight: '2.6rem', borderColor: 'var(--accent-gold)' }}
                   value={adminPin}
                   onChange={(e) => setAdminPin(e.target.value)}
-                  placeholder="Enter Security PIN (e.g. 8899)"
+                  placeholder="Enter Security PIN"
                   required
                 />
                 <KeyRound size={18} color="var(--accent-gold)" style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)' }} />
@@ -210,9 +210,6 @@ export const Login = () => {
                   {showPin ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block' }}>
-                Default Admin Master Passcode: <strong>8899</strong>
-              </span>
             </div>
           )}
 
