@@ -529,15 +529,16 @@ h1, h2, h3, h4, h5, h6 {
 .running-horse-icon {
   position: absolute;
   bottom: 4px;
-  left: -50px;
+  left: 100%;
   font-size: 1.75rem;
   animation: gallop 12s linear infinite;
   filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5));
+  white-space: nowrap;
 }
 
 @keyframes gallop {
-  0% { left: -50px; transform: scaleX(1); }
-  100% { left: 100%; transform: scaleX(1); }
+  0% { left: 100%; }
+  100% { left: -60px; }
 }
 
 /* Stat Cards with Hover Elevation */
