@@ -6,7 +6,7 @@ import { Badge } from '../components/Badge';
 import { SkeletonCard, SkeletonTable } from '../components/Skeleton';
 import { HorseGallopAnimation } from '../components/HorseGallopAnimation';
 import { EmptyState } from '../components/EmptyState';
-import { Trophy, Calendar, Users, Award, Flag, ArrowRight, MapPin, Clock, ShieldCheck } from 'lucide-react';
+import { Trophy, Calendar, Users, Award, Flag, ArrowRight, MapPin, ShieldCheck } from 'lucide-react';
 
 export const Dashboard = () => {
   const [stats, setStats] = useState(null);
@@ -171,33 +171,37 @@ export const Dashboard = () => {
         {loading ? (
           <SkeletonTable rows={4} />
         ) : stats?.recentResults && stats.recentResults.length > 0 ? (
-          <div className="glass-card table-container">
+          <div className="table-container">
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Rank</th>
-                  <th>Race Event</th>
-                  <th>Winning Horse</th>
-                  <th>Assigned Jockey</th>
-                  <th>Finish Time</th>
+                  <th style={{ width: '10%', textAlign: 'center' }}>Rank</th>
+                  <th style={{ width: '25%', textAlign: 'left' }}>Race Event</th>
+                  <th style={{ width: '22%', textAlign: 'left' }}>Winning Horse</th>
+                  <th style={{ width: '25%', textAlign: 'left' }}>Assigned Jockey</th>
+                  <th style={{ width: '18%', textAlign: 'center' }}>Finish Time</th>
                 </tr>
               </thead>
               <tbody>
                 {stats.recentResults.map((res) => (
                   <tr key={res.resultId}>
-                    <td>
+                    <td style={{ textAlign: 'center' }}>
                       <span style={{
                         fontWeight: 800,
-                        fontSize: '1rem',
+                        fontSize: '0.95rem',
                         color: res.position === 1 ? 'var(--accent-gold)' : res.position === 2 ? '#9CA3AF' : res.position === 3 ? '#D97706' : '#FFF'
                       }}>
                         #{res.position} {res.position === 1 && '🥇'} {res.position === 2 && '🥈'} {res.position === 3 && '🥉'}
                       </span>
                     </td>
-                    <td><strong>{res.raceName}</strong></td>
-                    <td>{res.horseName}</td>
-                    <td>{res.jockeyName}</td>
-                    <td><span style={{ fontFamily: 'monospace', fontWeight: 600 }}>{res.finishTime}</span></td>
+                    <td style={{ textAlign: 'left' }}><strong>{res.raceName}</strong></td>
+                    <td style={{ textAlign: 'left' }}>🐎 {res.horseName}</td>
+                    <td style={{ textAlign: 'left' }}>🏇 {res.jockeyName}</td>
+                    <td style={{ textAlign: 'center' }}>
+                      <span style={{ fontFamily: 'monospace', fontWeight: 700, background: 'rgba(255, 255, 255, 0.05)', padding: '0.25rem 0.6rem', borderRadius: '6px' }}>
+                        {res.finishTime}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
