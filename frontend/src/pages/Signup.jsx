@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import { useToast } from '../components/Toast';
-import { Shield, User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Shield, User, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 export const Signup = () => {
   const [name, setName] = useState('');
@@ -55,7 +55,7 @@ export const Signup = () => {
         password: password
       });
 
-      showToast('Account created successfully. Please sign in.', 'success');
+      showToast('Account created successfully! Please sign in.', 'success');
       setLoading(false);
       navigate('/login');
     } catch (err) {
@@ -209,6 +209,13 @@ export const Signup = () => {
           >
             {loading ? 'CREATING ACCOUNT...' : 'CREATE ACCOUNT'}
           </button>
+
+          {loading && (
+            <div style={{ marginTop: '0.85rem', textAlign: 'center', fontSize: '0.8rem', color: 'var(--accent-emerald)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+              <Loader2 size={14} className="spinner" />
+              <span>Connecting to cloud server... If server is waking up, this may take a few seconds.</span>
+            </div>
+          )}
         </form>
 
         <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-color)', textAlign: 'center' }}>

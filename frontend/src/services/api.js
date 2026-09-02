@@ -4,6 +4,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_A
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 45000, // 45 seconds timeout to accommodate Render free-tier cold starts
   headers: {
     'Content-Type': 'application/json',
   },
@@ -29,7 +30,12 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    const message = error.response?.data?.message || error.message || 'An error occurred';
+    let message = error.response?.data?.message || error.message || 'An error occurred';
+    
+    if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+      message = 'Cloud server is waking up. Please try again in 5 seconds.';
+    }
+
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
